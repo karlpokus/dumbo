@@ -1,0 +1,9 @@
+github.com/julienschmidt/httprouter v1.3.0/go.mod h1:JR6WtHb+2LUe8TCKY3cZOxFyyO8IZAc4RVcycCCAKdM=
+github.com/karlpokus/ratelmt v0.1.0 h1:v71fywzMenIBvbPEpvbIutDW2Pm49ep3P/wwxRoEsHE=
+github.com/karlpokus/ratelmt v0.1.0/go.mod h1://mKZunJgKUJ7iYtydnAYtGrhzVFVbbYccTk5cOhmtg=
+github.com/karlpokus/routest/v2 v2.0.0/go.mod h1:gmYSDt1bDf/4SMG9GGTZDe65H/0MVPkvj7Fhw6neRUo=
+github.com/karlpokus/srv v0.3.1/go.mod h1:/vf/MnAOC6iHrQbEWML0NqE8N6WtPB+kAgpoaUKr+Mk=
+github.com/karlpokus/srv v0.5.0 h1:qohiHYQovmx/U/4dsZ+mGabkqYiqS58FSp1uS9VSB5I=
+github.com/karlpokus/srv v0.5.0/go.mod h1:5LRmPHytuLsVRZo7aY1Ic1TIOKabAbt/M6lENdY1PZ4=
+golang.org/x/time v0.0.0-20190921001708-c4c64cad1fd0 h1:xQwXv67TxFo9nC1GJFyab5eq/5B590r6RlnL/G8Sz7w=
+golang.org/x/time v0.0.0-20190921001708-c4c64cad1fd0/go.mod h1:tRJNPiyCQ0inRvYxbN9jk5I+vvW/OXSQhTDSoE431IQ=
