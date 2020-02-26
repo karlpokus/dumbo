@@ -3,13 +3,14 @@ package dumbo
 import (
 	"bytes"
 	"io"
-	"os"
 	"sync"
+
+	"dumbo/internal/file"
 )
 
 type Data struct {
-	gz   []byte
-	file *os.File
+	gz    []byte
+	store Store
 	sync.Mutex
 }
 
@@ -17,14 +18,14 @@ type Data struct {
 func (data *Data) Save(r io.Reader) error {
 	var buf bytes.Buffer
 	tee := io.TeeReader(r, &buf)
-	if err := reset(data.file); err != nil {
+	data.store.Reset()
+	if err := Decompress(data.store, tee); err != nil {
 		return err
 	}
-	if err := Decompress(data.file, tee); err != nil {
-		return err
-	}
-	if err := data.file.Sync(); err != nil {
-		return err
+	if v, ok := data.store.(*file.Store); ok {
+		if err := v.Sync(); err != nil {
+			return err
+		}
 	}
 	data.gz = buf.Bytes()
 	return nil
@@ -35,29 +36,19 @@ func (data *Data) Send(w io.Writer) {
 	w.Write(data.gz)
 }
 
-// New returns a ready-to-use Data type
-func New(fpath string) (*Data, error) {
-	f, err := os.OpenFile(fpath, os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil {
-		return nil, err
-	}
-	var buf bytes.Buffer
-	err = compress(&buf, f)
-	if err != nil {
-		return nil, err
-	}
-	data := &Data{
-		file: f, // keep it open
-		gz:   buf.Bytes(),
-	}
-	return data, nil
+func FileStore(fpath string) (*file.Store, error) {
+	return file.New(fpath)
 }
 
-// reset resets a file for writing
-func reset(f *os.File) error {
-	_, err := f.Seek(0, 0)
+// New returns a ready-to-use Data type
+func New(store Store) (*Data, error) {
+	var buf bytes.Buffer
+	err := compress(&buf, store)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return f.Truncate(0)
+	return &Data{
+		gz:    buf.Bytes(),
+		store: store,
+	}, nil
 }

@@ -22,7 +22,7 @@ $ go run cmd/server/main.go testdata/nice.json
 # client read
 $ curl -s 0.0.0.0:7979/read | gzip -d | jq
 # client write
-$ cat testdata/false.gz | curl -H Content-Encoding:gzip --data-binary @- 0.0.0.0:7979/write
+$ curl -H Content-Encoding:gzip --data-binary @testdata/false.gz 0.0.0.0:7979/write
 ```
 
 # test
@@ -40,7 +40,8 @@ $ go test -v -race
 - [ ] timeout on read lock contention
 - [ ] relax mutex on reads
 - [ ] optional basic auth for writes
-- [ ] maybe make filewr a package?
+- [x] pass store interface to data.New
+- [x] file.Store type
 
 # license
 MIT

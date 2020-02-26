@@ -17,7 +17,11 @@ func main() {
   }
   fpath := os.Args[1]
 	s, err := srv.New(func(s *srv.Server) error {
-		data, err := dumbo.New(fpath)
+    f, err := dumbo.FileStore(fpath)
+    if err != nil {
+			return err
+		}
+		data, err := dumbo.New(f)
 		if err != nil {
 			return err
 		}
