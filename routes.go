@@ -3,22 +3,36 @@ package dumbo
 import (
 	"log"
 	"net/http"
+
+	"github.com/karlpokus/ratelmt"
 )
 
-func Read(data *Data) http.HandlerFunc {
+func Routes(data *Data, stderr *log.Logger, limit int) http.Handler {
+	router := http.NewServeMux()
+	router.Handle("/read", ratelmt.Mw(float64(limit), read(data)))
+	router.Handle("/write", ratelmt.Mw(float64(limit), write(data, stderr)))
+	return router
+}
+
+func read(data *Data) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.Error(w, http.StatusText(405), 405)
 			return
 		}
+		if r.Header.Get("Etag") == data.hash {
+			w.WriteHeader(304)
+			return
+		}
 		w.Header().Set("Content-Encoding", "gzip")
 		data.Lock()
 		defer data.Unlock()
-		data.Send(w)
+		w.Header().Set("Etag", data.hash)
+		w.Write(data.gz)
 	}
 }
 
-func Write(data *Data, stderr *log.Logger) http.HandlerFunc {
+func write(data *Data, stderr *log.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, http.StatusText(405), 405)
@@ -37,10 +51,13 @@ func Write(data *Data, stderr *log.Logger) http.HandlerFunc {
 		defer data.Unlock()
 		err := data.Save(r.Body)
 		if err != nil {
-			stderr.Printf("Unable to save request body: %s\n", err)
+			if stderr != nil {
+				stderr.Printf("Unable to save request body: %s\n", err)
+			}
 			http.Error(w, http.StatusText(500), 500)
 			return
 		}
+		w.Header().Set("Etag", data.hash)
 		w.WriteHeader(201)
 	}
 }

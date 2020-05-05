@@ -10,6 +10,7 @@ import (
 
 type Data struct {
 	gz    []byte
+	hash  string
 	store Store
 	sync.Mutex
 }
@@ -27,13 +28,10 @@ func (data *Data) Save(r io.Reader) error {
 			return err
 		}
 	}
-	data.gz = buf.Bytes()
+	b := buf.Bytes()
+	data.gz = b
+	data.hash = hash(b)
 	return nil
-}
-
-// Send writes the compressed blob to w
-func (data *Data) Send(w io.Writer) {
-	w.Write(data.gz)
 }
 
 func FileStore(fpath string) (*file.Store, error) {
@@ -47,8 +45,10 @@ func New(store Store) (*Data, error) {
 	if err != nil {
 		return nil, err
 	}
+	b := buf.Bytes()
 	return &Data{
-		gz:    buf.Bytes(),
+		gz:    b,
 		store: store,
+		hash:  hash(b),
 	}, nil
 }

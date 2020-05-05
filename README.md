@@ -9,11 +9,11 @@ The server is agnostic on blob contents. It just provides it over http.
 # api
 - GET /read
 
-Server returns compressed blob to client.
+Server returns compressed blob and a 200 to client. Matching Etag returns 304.
 
 - POST /write
 
-Expects a compressed blob as request body and header `Content-Encoding:gzip`. The blob is persisted to disk. As an experminent we keep this file open for reads and writes for the duration of the server lifetime.
+Expects a compressed blob as request body and header `Content-Encoding:gzip` for a successful 201. The blob is persisted uncompressed to disk. As an experminent we keep this file open for reads and writes for the duration of the server lifetime.
 
 # usage
 ```bash
@@ -33,13 +33,14 @@ $ go test -v -race
 # todos
 - [x] compress data over wire
 - [ ] compare hashed blob before persist to disk
-- [ ] send hash as Etag to read requests
+- [x] send hash as Etag to read requests
 - [ ] k8s operator
 - [ ] investigate graceful exits and mutex
 - [ ] encryption
 - [ ] timeout on read lock contention
 - [ ] relax mutex on reads
 - [ ] optional basic auth for writes
+- [ ] add Dockerfile
 - [x] pass store interface to data.New
 - [x] file.Store type
 
