@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"dumbo"
-	"github.com/karlpokus/ratelmt"
 	"github.com/karlpokus/srv"
 )
 
@@ -25,10 +24,7 @@ func main() {
 		if err != nil {
 			return err
 		}
-		router := s.DefaultRouter()
-		router.Handle("/read", ratelmt.Mw(1, dumbo.Read(data)))
-		router.Handle("/write", ratelmt.Mw(1, dumbo.Write(data, stderr)))
-		s.Router = router
+		s.Router = dumbo.Routes(data, stderr, 1)
 		s.Logger = stdout
 		s.Host = "0.0.0.0"
 		s.Port = "7979"
