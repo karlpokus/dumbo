@@ -2,7 +2,6 @@ package dumbo
 
 import (
 	"compress/gzip"
-	"crypto/sha1"
 	"io"
 )
 
@@ -25,11 +24,4 @@ func Decompress(w io.Writer, r io.Reader) error {
 		return err
 	}
 	return gz.Close()
-}
-
-// hash returns b hashed
-func hash(b []byte) []byte {
-	h := sha1.New()
-	h.Write(b)
-	return h.Sum(nil)
 }
