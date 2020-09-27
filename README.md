@@ -1,5 +1,5 @@
 # dumbo
-A blob with a mutex over http
+A blob with a mutex over http. A silly experiment.
 
 # why?
 Most databases perform queries on data on behalf of clients. Queries are resource hungry. By the server only providing the blob - the burden will be shifted to the client and thus save server resources. Clients will run queries on in-memory data, which is likely to be fast, saving network hops.
